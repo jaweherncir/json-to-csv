@@ -1,142 +1,3 @@
-/*const express = require('express');
-const multer = require('multer');
-const json2csv = require('json2csv').parse;
-const fs = require('fs');
-
-const app = express();
-const port = 3000;
-
-// Configure multer to handle file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-app.use(express.json());
-
-// Serve a form to upload JSON
-app.get('/', (req, res) => {
-  res.send(`
-  <!DOCTYPE html>
-<html>
-<head>
-  <!-- Include Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <form action="/upload" method="post" enctype="multipart/form-data">
-          <div class="form-group">
-            <label for="jsonFile">Upload JSON File</label>
-            <input type="file" class="form-control-file" id="jsonFile" name="jsonFile">
-          </div>
-          <button type="submit" class="btn btn-primary">Upload JSON</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Include Bootstrap JS (optional) -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-
-  `);
-});
-
-// Handle JSON upload
-app.post('/upload', upload.single('jsonFile'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
-
-  try {
-    const json = JSON.parse(req.file.buffer.toString());
-
-    if (Array.isArray(json)) {
-      if (json.length === 0) {
-        throw new Error('Uploaded JSON is an empty array');
-      }
-    }
-
-    const fields = Array.isArray(json) ? Object.keys(json[0]) : Object.keys(json);
-    const csv = json2csv(json, { fields });
-
-    fs.writeFileSync('output.csv', csv);
-    res.send('JSON uploaded and converted to CSV. <a href="/download">Download CSV</a>');
-  } catch (error) {
-    console.error(error);
-    res.status(400).send('Error processing the uploaded JSON file.');
-  }
-});
-
-// Serve the CSV file for download
-app.get('/download', (req, res) => {
-  const csv = fs.readFileSync('output.csv', 'utf8');
-  res.header('Content-Disposition', 'attachment; filename=converted.csv');
-  res.type('csv');
-  res.send(csv);
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*const express = require('express');
-const mongoose = require('mongoose');
-const fs = require('fs');
-const app = express();
-const port = 3000;
-
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://freezepix:freezepix@freezepix.mhc6ham.mongodb.net/crystal', { useNewUrlParser: true });
-
-// Create a Mongoose model for your collection
-const jsonDataModel = mongoose.model('JsonData', {
-  data: Object
-});
-
-// Create a route to handle JSON file upload and data storage
-app.post('/upload', (req, res) => {
-  // Read the JSON file
-  const jsonData = JSON.parse(fs.readFileSync('29439939.json', 'utf8'));
-
-  // Create a new document and save it to the collection
-  const newJsonData = new jsonDataModel({ data: jsonData });
-  newJsonData.save()
-    .then(result => {
-      res.send('JSON data saved to MongoDB');
-    })
-    .catch(error => {
-      res.status(500).send('Error saving JSON data to MongoDB');
-    });
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-*/
-
-
-
-
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
@@ -223,7 +84,15 @@ app.post('/upload', (req, res) => {
       res.status(401).json({ success: false, message: 'order already registered' });
     });
 });
-
+app.get('/jsonData', async (req, res) => {
+  try {
+    // Use the Mongoose model to find all documents in the collection
+    const jsonData = await jsonDataModel.find({}).exec();
+    res.json({ success: true, data: jsonData });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
